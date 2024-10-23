@@ -15,7 +15,7 @@ double bisection(double (*func)(double), double a, double b, double tol, int max
 
     double c, fc;
     int iter_cnt = 0;
-    while (fabs(a - b) >= tol) {
+    while (fabs(a - b) > tol) {
         c = (a + b) / 2;
         fc = func(c);
         if (fa * fc < 0) {
@@ -24,7 +24,25 @@ double bisection(double (*func)(double), double a, double b, double tol, int max
             a = c;
         }
 
-        if (iter_cnt >= max_iter) {
+        if (iter_cnt > max_iter) {
+            return NAN;
+        } else {
+            iter_cnt++;
+        }
+    }
+
+    return (a + b) / 2;
+}
+
+double secant(double (*func)(double), double a, double b, double tol, int max_iter) {
+    int iter_cnt = 0;
+    double c;
+    while (fabs(a - b) > tol) {
+        c = b - func(b) * (b - a) / (func(b) - func(a));
+        a = b;
+        b = c;
+
+        if (iter_cnt > max_iter) {
             return NAN;
         } else {
             iter_cnt++;

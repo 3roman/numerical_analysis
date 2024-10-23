@@ -5,5 +5,6 @@
 #include <math.h>
 
 double bisection(double (*func)(double), double a, double b, double tol, int max_iter);
+double secant(double (*func)(double), double a, double b, double tol, int max_iter);
 
 #endif
