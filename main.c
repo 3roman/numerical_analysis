@@ -10,8 +10,8 @@ double example_function(double x) {
 }
 
 int main() {
-    printf("bisection ->\t\t\t%f\n", bisection(example_function, 1, 2.5, EPSILON, MAX_ITER));
-    printf("secant ->\t\t\t%f\n", secant(example_function, 1, 2.5, EPSILON, MAX_ITER));
+    printf("%-20s%f\n", "bisection ->", bisection(example_function, 1, 2.5, EPSILON, MAX_ITER));
+    printf("%-20s%f\n", "secant ->", secant(example_function, 1, 2.5, EPSILON, MAX_ITER));
 
     return 0;
 }
