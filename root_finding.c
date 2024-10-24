@@ -94,12 +94,13 @@ double newton(double (*func)(double), double initial_guess, double tol, int max_
     double x1 = initial_guess, x2;
 
     // x2 = x1 - f(x1)/f'(x1)
-    for (int i = 0; i < max_iter; i++) {
+    while (iter_cnt <= max_iter) {
         x2 = x1 - func(x1) / central_finite_difference(func, x1, tol);
         if (fabs(x1 - x2) < tol) {
             return (x1 + x2) / 2;
         }
         x1 = x2;
+        iter_cnt++;
     }
 
     return NAN;
