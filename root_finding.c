@@ -51,3 +51,39 @@ double secant(double (*func)(double), double a, double b, double tol, int max_it
 
     return (a + b) / 2;
 }
+
+double regula_falsi(double (*func)(double), double a, double b, double tol, int max_iter) {
+    double fa = func(a);
+    double fb = func(b);
+    if (fabs(fa) <= tol) {
+        return a;
+    }
+    if (fabs(fb) <= tol) {
+        return b;
+    }
+    if (fa * fb > 0) {
+        return NAN;
+    }
+
+    double c, fc;
+    int iter_cnt = 0;
+    while (fabs(a - b) > tol) {
+        // The only difference here from the bisection method is that
+        // the intersection of the secant with the x-axis is used instead of the midpoint
+        c = b - func(b) * (b - a) / (func(b) - func(a));
+        fc = func(c);
+        if (fa * fc < 0) {
+            b = c;
+        } else {
+            a = c;
+        }
+
+        if (iter_cnt > max_iter) {
+            return NAN;
+        } else {
+            iter_cnt++;
+        }
+    }
+
+    return (a + b) / 2;
+}
