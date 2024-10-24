@@ -52,6 +52,7 @@ double secant(double (*func)(double), double a, double b, double tol, int max_it
     return (a + b) / 2;
 }
 
+// regula_falsi is the variant of bisection
 double regula_falsi(double (*func)(double), double a, double b, double tol, int max_iter) {
     double fa = func(a);
     double fb = func(b);
@@ -86,4 +87,20 @@ double regula_falsi(double (*func)(double), double a, double b, double tol, int 
     }
 
     return (a + b) / 2;
+}
+
+double newton(double (*func)(double), double initial_guess, double tol, int max_iter) {
+    int iter_cnt = 0;
+    double x1 = initial_guess, x2;
+
+    // x2 = x1 - f(x1)/f'(x1)
+    for (int i = 0; i < max_iter; i++) {
+        x2 = x1 - func(x1) / central_finite_difference(func, x1, tol);
+        if (fabs(x1 - x2) < tol) {
+            return (x1 + x2) / 2;
+        }
+        x1 = x2;
+    }
+
+    return NAN;
 }
