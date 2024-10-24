@@ -8,7 +8,7 @@
 
 double bisection(double (*func)(double), double a, double b, double tol, int max_iter);
 double secant(double (*func)(double), double a, double b, double tol, int max_iter);
-double regula_falsi(double (*func)(double), double a, double b, double tol, int max_iter);
 double newton(double (*func)(double), double initial_guess, double tol, int max_iter);
+double brent(double (*func)(double), double a, double b, double tol, int max_iter);
 
 #endif
