@@ -68,106 +68,79 @@ double newton(double (*func)(double), double initial_guess, double tol, int max_
     return NAN;
 }
 
-double brent(double (*func)(double), double a, double b, double tol, int max_iter) {
-    double m = 0.0, p = 0.0, q = 0.0, r = 0.0, s = 0.0;
+double brent(double (*func)(double), double lower, double upper, double tol, int max_iter) {
+    double a = lower;
+    double b = upper;
+    double fa = func(a);  // calculated now to save function calls
+    double fb = func(b);  // calculated now to save function calls
+    double fs = 0.0;
+    double temp;
 
-    double a1 = a;
-    double b1 = b;
-    double fa = func(a1);
-    double fb = func(b1);
+    if (!(fa * fb < 0)) return NAN;
 
-    double c = a1;
-    double fc = fa;      // Function value at c (same as fa initially)
-    double e = b1 - a1;  // Interval size
-    double d = e;
-
-    int iter_cnt = 0;
-    while (iter_cnt < max_iter) {
-        // Ensure that |fb| is always the smallest, if not, swap variables
-        if (fabs(fc) < fabs(fb)) {
-            a1 = b1;
-            b1 = c;
-            c = a1;
-            fa = fb;
-            fb = fc;
-            fc = fa;
-        }
-
-        // Compute the midpoint
-        m = (c - b1) / 2;
-
-        // Check for convergence: if m is within tolerance or root found
-        if ((fabs(m) <= tol) || (fb == 0.0)) {
-            break;
-        }
-
-        // If previous step was small or |fa| <= |fb|, use bisection
-        if ((fabs(e) < tol) || (fabs(fa) <= fabs(fb))) {
-            e = m;
-            d = e;  // Bisection step
-        } else {
-            // Inverse quadratic interpolation
-            s = fb / fa;
-
-            if (a1 == c) {
-                p = 2.0 * m * s;  // Linear interpolation
-                q = 1.0 - s;
-            } else {
-                q = fa / fc;
-                r = fb / fc;
-                // Parabolic interpolation
-                p = s * (2.0 * m * q * (q - r) - (b1 - a1) * (r - 1.0));
-                q = (q - 1.0) * (r - 1.0) * (s - 1.0);
-            }
-
-            // Make sure p is in the correct direction
-            if (p > 0.0) {
-                q = -q;
-            } else {
-                p = -p;
-            }
-
-            // Adjust step size
-            s = e;
-            e = d;
-
-            // Accept interpolation only if it provides a reasonable step
-            if ((2.0 * p < 3.0 * m * q - fabs(tol * q)) && (p < fabs(0.5 * s * q))) {
-                d = p / q;
-            } else {
-                // Use bisection if interpolation fails
-                e = m;
-                d = e;
-            }
-        }
-
-        // Update a1, fa, b1
-        a1 = b1;
+    // if magnitude of func(lower_bound) is less than magnitude of func(upper_bound)
+    if (fabs(fa) < fabs(b)) {
+        temp = a;
+        a = b;
+        b = temp;
+        temp = fa;
         fa = fb;
-
-        // Update b1 using the step size
-        if (tol < fabs(d)) {
-            b1 += d;
-        } else if (0.0 < m) {
-            b1 += tol;
-        } else {
-            b1 -= tol;
-        }
-
-        // Update function value at b1
-        fb = func(b1);
-
-        // If fb and fc have the same sign, update c
-        if ((0.0 < fb && 0.0 < fc) || (fb <= 0.0 && fc <= 0.0)) {
-            c = a1;
-            fc = fa;
-            e = b1 - a1;
-            d = e;
-        }
-
-        iter_cnt++;
+        fb = temp;
     }
 
-    // Return the best estimate of the root
-    return b1;
+    double c = a;       // c now equals the largest magnitude of the lower and upper bounds
+    double fc = fa;     // precompute function evalutation for point c by assigning it the same value as fa
+    bool mflag = true;  // boolean flag used to evaluate if statement later on
+    double s = 0.0;     // Our Root that will be returned
+    double d = 0.0;     // Only used if mflag is unset (mflag == false)
+
+    for (int iter = 0; iter < max_iter; iter++) {
+        // stop if converged on root or error is less than tolerance
+        if (fabs(b - a) < tol) return s;
+
+        if (fa != fc && fb != fc) {
+            // use inverse quadratic interopolation
+            s = (a * fb * fc / ((fa - fb) * (fa - fc))) + (b * fa * fc / ((fb - fa) * (fb - fc))) + (c * fa * fb / ((fc - fa) * (fc - fb)));
+        } else {
+            // secant method
+            s = b - fb * (b - a) / (fb - fa);
+        }
+
+        // checks to see whether we can use the faster converging quadratic && secant methods or if we need to use bisection
+        if (((s < (3 * a + b) * 0.25) || (s > b)) ||
+            (mflag && (fabs(s - b) >= (fabs(b - c) * 0.5))) ||
+            (!mflag && (fabs(s - b) >= (fabs(c - d) * 0.5))) ||
+            (mflag && (fabs(b - c) < tol)) ||
+            (!mflag && (fabs(c - d) < tol))) {
+            // bisection method
+            s = (a + b) * 0.5;
+            mflag = true;
+        } else {
+            mflag = false;
+        }
+
+        fs = func(s);  // calculate fs
+        d = c;         // first time d is being used (wasnt used on first iteration because mflag was set)
+        c = b;         // set c equal to upper bound
+        fc = fb;       // set func(c) = func(b)
+
+        if (fa * fs < 0)  // fa and fs have opposite signs
+        {
+            b = s;
+            fb = fs;  // set func(b) = func(s)
+        } else {
+            a = s;
+            fa = fs;  // set func(a) = func(s)
+        }
+
+        if (fabs(fa) < fabs(fb))  // if magnitude of fa is less than magnitude of fb
+        {
+            temp = a;
+            a = b;
+            b = temp;
+            temp = fa;
+            fa = fb;
+            fb = temp;
+        }
+    }
 }

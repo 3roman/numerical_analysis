@@ -2,7 +2,8 @@
     "files.associations": {
         "root_finding.h": "c",
         "math.h": "c",
-        "numerical_differentiation.h": "c"
+        "numerical_differentiation.h": "c",
+        "stdbool.h": "c"
     },
     "C_Cpp.default.compilerPath": "gcc.exe"
 }
