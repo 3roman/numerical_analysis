@@ -10,10 +10,10 @@ double example_function(double x) {
 }
 
 int main() {
-    printf("%-20s%f\n", "bisection ->", bisection(example_function, 3, 2, EPSILON, MAX_ITER));
-    printf("%-20s%f\n", "secant ->", secant(example_function, 3, 2, EPSILON, MAX_ITER));
-    printf("%-20s%f\n", "newton ->", newton(example_function, 2, EPSILON, MAX_ITER));
-    printf("%-20s%f\n", "brent ->", brent(example_function, 3, 2, EPSILON, MAX_ITER));
+    printf("%-20s%f\n", "bisection ->", bisection(example_function, 1, 3, EPSILON, MAX_ITER));
+    printf("%-20s%f\n", "secant ->", secant(example_function, 1, 3, EPSILON, MAX_ITER));
+    printf("%-20s%f\n", "newton ->", newton(example_function, 1.5, EPSILON, MAX_ITER));
+    printf("%-20s%f\n", "brent ->", brent(example_function, 1, 3, EPSILON, MAX_ITER));
 
     return 0;
 }
