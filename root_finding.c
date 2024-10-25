@@ -2,65 +2,65 @@
 
 double bisection(double (*func)(double), double a, double b, double tol, int max_iter) {
     double fa = func(a), fb = func(b);
-    if (fabs(fa) <= tol) {
-        return a;
-    }
-    if (fabs(fb) <= tol) {
-        return b;
-    }
-    if (fa * fb > 0) {
-        return NAN;
-    }
+    if (fabs(fa) <= tol) return a;
+    if (fabs(fb) <= tol) return b;
+    if (fa * fb > 0) return NAN;
 
     double c = 0.0, fc = 0.0;
     int iter_cnt = 0;
+
     while (fabs(a - b) > tol) {
-        c = (a + b) / 2;
+        if (iter_cnt > max_iter) return NAN;
+        c = 0.5 * (a + b);
         fc = func(c);
+
         if (fa * fc < 0) {
             b = c;
         } else {
             a = c;
         }
 
-        if (iter_cnt > max_iter) {
-            return NAN;
-        } else {
-            iter_cnt++;
-        }
+        iter_cnt++;
     }
 
-    return (a + b) / 2;
+    return c;
 }
 
 double secant(double (*func)(double), double a, double b, double tol, int max_iter) {
     int iter_cnt = 0;
-    double c = 0.0;
-    while (fabs(a - b) > tol) {
-        c = b - func(b) * (b - a) / (func(b) - func(a));
-        a = b;
-        b = c;
+    double fa = func(a), fb = func(b);
+    double c = 0.0, fc = 0.0;
 
-        if (iter_cnt > max_iter) {
-            return NAN;
-        } else {
-            iter_cnt++;
-        }
+    while (iter_cnt < max_iter) {
+        c = b - fb * (b - a) / (fb - fa);
+        fc = func(c);
+
+        a = b;
+        fa = fb;
+        b = c;
+        fb = fc;
+
+        if (fabs(b - a) <= tol || fabs(fc) <= tol) return c;
+
+        iter_cnt++;
     }
 
-    return (a + b) / 2;
+    return NAN;
 }
 
 double newton(double (*func)(double), double initial_guess, double tol, int max_iter) {
     int iter_cnt = 0;
     double x1 = initial_guess, x2 = 0.0;
+    double derivative = 0.0;
 
     // x2 = x1 - f(x1)/f'(x1)
     while (iter_cnt <= max_iter) {
-        x2 = x1 - func(x1) / central_finite_difference(func, x1, tol);
-        if (fabs(x1 - x2) < tol) {
-            return (x1 + x2) / 2;
-        }
+        derivative = central_finite_difference(func, x1, tol);
+        if (derivative < tol) return NAN;  // tangent is too flat to continue
+
+        x2 = x1 - func(x1) / derivative;
+        if (fabs(x1 - x2) <= tol || fabs(func(x2)) <= tol) return x2;
+
         x1 = x2;
         iter_cnt++;
     }
