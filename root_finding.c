@@ -26,42 +26,41 @@ double bisection(double (*func)(double), double a, double b, double tol, int max
     return c;
 }
 
-double secant(double (*func)(double), double a, double b, double tol, int max_iter) {
+double newton(double (*func)(double), double initial_guess, double tol, int max_iter) {
+    // divergent example: f(x) = x * x * x - 2 * x + 2 with initial value of 0.6
+
     int iter_cnt = 0;
-    double fa = func(a), fb = func(b);
-    double c = 0.0, fc = 0.0;
+    double x1 = initial_guess, x2 = 0.0;
+    double derivative = 0.0;
 
+    // x2 = x1 - f(x1) / f'(x1)
     while (iter_cnt < max_iter) {
-        c = b - fb * (b - a) / (fb - fa);
-        fc = func(c);
-
-        a = b;
-        fa = fb;
-        b = c;
-        fb = fc;
-
-        if (fabs(b - a) <= tol || fabs(fc) <= tol) return c;
-
+        derivative = central_finite_difference(func, x1, tol);
+        // tangent is too flat to continue
+        if (fabs(derivative) < tol) return NAN;
+        x2 = x1 - func(x1) / derivative;
+        if (fabs(func(x2)) <= tol) return x2;
+        x1 = x2;
         iter_cnt++;
     }
 
     return NAN;
 }
 
-double newton(double (*func)(double), double initial_guess, double tol, int max_iter) {
+double secant(double (*func)(double), double a, double b, double tol, int max_iter) {
     int iter_cnt = 0;
-    double x1 = initial_guess, x2 = 0.0;
-    double derivative = 0.0;
+    double fa = func(a), fb = func(b);
+    double c = 0.0, fc = 0.0;
 
-    // x2 = x1 - f(x1)/f'(x1)
-    while (iter_cnt <= max_iter) {
-        derivative = central_finite_difference(func, x1, tol);
-        if (derivative < tol) return NAN;  // tangent is too flat to continue
+    while (iter_cnt < max_iter) {
+        c = b - fb * ((b - a) / (fb - fa));
+        fc = func(c);
+        if (fabs(fc) <= tol) return c;
+        a = b;
+        fa = fb;
+        b = c;
+        fb = fc;
 
-        x2 = x1 - func(x1) / derivative;
-        if (fabs(x1 - x2) <= tol || fabs(func(x2)) <= tol) return x2;
-
-        x1 = x2;
         iter_cnt++;
     }
 
