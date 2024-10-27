@@ -6,7 +6,7 @@ const double EPSILON = 1e-6;
 const double MAX_ITER = 1e3;
 
 double example_function(double x) {
-    return pow(x, 5) - pow(x, 4) - pow(x, 3) - pow(x, 2) - x - 4;
+    return pow(x, 8) - pow(x, 4) - pow(x, 3) - pow(x, 2) - x - 4;
 }
 
 int main() {

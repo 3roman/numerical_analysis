@@ -41,6 +41,7 @@ double newton(double (*func)(double), double initial_guess, double tol, int max_
         x2 = x1 - func(x1) / derivative;
         if (fabs(func(x2)) <= tol) return x2;
         x1 = x2;
+
         iter_cnt++;
     }
 
@@ -48,6 +49,8 @@ double newton(double (*func)(double), double initial_guess, double tol, int max_
 }
 
 double secant(double (*func)(double), double a, double b, double tol, int max_iter) {
+    // divergent example: f(x) = x8 -x4 - x3 -x2 -x -4 = 0 with interval of [1, 3]
+
     int iter_cnt = 0;
     double fa = func(a), fb = func(b);
     double c = 0.0, fc = 0.0;
@@ -68,18 +71,13 @@ double secant(double (*func)(double), double a, double b, double tol, int max_it
 }
 
 double brent(double (*func)(double), double lower, double upper, double tol, int max_iter) {
-    double a = lower;
-    double b = upper;
-    double fa = func(a);  // calculated now to save function calls
-    double fb = func(b);  // calculated now to save function calls
-    double fs = 0.0;
-    double temp;
-
+    double a = lower, b = upper;
+    double fa = func(a), fb = func(b), fs = 0.0;  // calculated now to save function calls
     if (!(fa * fb < 0)) return NAN;
 
     // if magnitude of func(lower_bound) is less than magnitude of func(upper_bound)
     if (fabs(fa) < fabs(b)) {
-        temp = a;
+        double temp = a;
         a = b;
         b = temp;
         temp = fa;
@@ -94,7 +92,6 @@ double brent(double (*func)(double), double lower, double upper, double tol, int
     double d = 0.0;     // Only used if mflag is unset (mflag == false)
 
     for (int iter = 0; iter < max_iter; iter++) {
-        // stop if converged on root or error is less than tolerance
         if (fabs(b - a) < tol) return s;
 
         if (fa != fc && fb != fc) {
@@ -118,10 +115,10 @@ double brent(double (*func)(double), double lower, double upper, double tol, int
             mflag = false;
         }
 
-        fs = func(s);  // calculate fs
-        d = c;         // first time d is being used (wasnt used on first iteration because mflag was set)
-        c = b;         // set c equal to upper bound
-        fc = fb;       // set func(c) = func(b)
+        fs = func(s);
+        d = c;  // first time d is being used (wasnt used on first iteration because mflag was set)
+        c = b;  // set c equal to upper bound
+        fc = fb;
 
         if (fa * fs < 0)  // fa and fs have opposite signs
         {
@@ -134,7 +131,7 @@ double brent(double (*func)(double), double lower, double upper, double tol, int
 
         if (fabs(fa) < fabs(fb))  // if magnitude of fa is less than magnitude of fb
         {
-            temp = a;
+            double temp = a;
             a = b;
             b = temp;
             temp = fa;
@@ -142,4 +139,6 @@ double brent(double (*func)(double), double lower, double upper, double tol, int
             fb = temp;
         }
     }
+
+    return b;
 }
