@@ -4,6 +4,6 @@
 #include <float.h>
 #include <math.h>
 
-double central_finite_difference(double (*func)(double), double x, double h);
+double central_difference(double (*func)(double), double x, double h);
 
 #endif

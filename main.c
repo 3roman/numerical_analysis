@@ -18,4 +18,4 @@ int main() {
     printf("%-20s%f\n", "brent ->", brent(example_function, 1, 3, EPSILON, MAX_ITER));
 
     return 0;
-}
+} 

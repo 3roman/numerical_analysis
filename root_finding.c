@@ -35,7 +35,7 @@ double newton(double (*func)(double), double initial_guess, double tol, int max_
 
     // x2 = x1 - f(x1) / f'(x1)
     while (iter_cnt < max_iter) {
-        derivative = central_finite_difference(func, x1, tol);
+        derivative = central_difference(func, x1, tol);
         // tangent is too flat to continue
         if (fabs(derivative) < tol) return NAN;
         x2 = x1 - func(x1) / derivative;
